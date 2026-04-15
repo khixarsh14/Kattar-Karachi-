@@ -2,8 +2,7 @@
 .vscode/
 
 # Build files
-build/*.exe
-build/**/*.exe
+build/
 *.exe
 *.out
 *.o
