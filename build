@@ -1,1 +1,0 @@
-#To keep our project clean, we use "Out-of-Source" builds. This means all the messy temporary files stay inside the /build folder and don't clutter our code.

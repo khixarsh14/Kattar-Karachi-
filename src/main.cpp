@@ -1,2 +1,7 @@
-//testing my branch - meesam
-// 123 hello
+#include "game.h"
+
+int main() {
+    Game game;
+    game.Run();
+    return 0;
+}
