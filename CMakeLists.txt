@@ -11,15 +11,31 @@ target_include_directories(KattarKarachi PRIVATE include)
 
 # 2. SOURCE FILES: List all the .cpp files that need to be compiled
 # (Add new .cpp files here as you create them)
-set(SOURCES 
-    src/main.cpp 
-    src/Game.cpp 
-    src/Player.cpp
-    # Add other .cpp files here...
+set(SOURCES
+    src/main.cpp
+    src/game.cpp
+    src/player.cpp
+    src/map.cpp
+    src/obstacle.cpp
+    src/Pothole.cpp
+    src/pushcart.cpp
+    src/scoremanager.cpp
+    src/streetdog.cpp
+    src/task.cpp
+    src/TaskManager.cpp
+    src/trashpile.cpp
+    src/UImanager.cpp
 )
 
 # 3. EXECUTABLE: Create the final playable game file
 add_executable(KattarKarachi ${SOURCES})
 
 # 4. LIBRARIES: If we add SFML or SDL later, we link them here
-# target_link_libraries(KattarKarachi ...)
+target_include_directories(KattarKarachi PRIVATE include)
+
+target_link_libraries(KattarKarachi
+    raylib
+    opengl32
+    gdi32
+    winmm
+)
