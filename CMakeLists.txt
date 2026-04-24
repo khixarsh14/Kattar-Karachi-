@@ -10,14 +10,13 @@ set(SOURCES
     src/Pothole.cpp
     src/pushcart.cpp
     src/trashpile.cpp
-    src/streetdog.cpp
     src/task.cpp
     src/TaskManager.cpp
     src/scoremanager.cpp
     src/UImanager.cpp
 )
 
-add_executable(KattarKarachi ${SOURCES})
+add_executable(game ${SOURCES})
 
 target_include_directories(KattarKarachi PRIVATE include)
 
