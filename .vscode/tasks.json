@@ -14,7 +14,6 @@
                 "src/Pothole.cpp",
                 "src/pushcart.cpp",
                 "src/scoremanager.cpp",
-                "src/streetdog.cpp",
                 "src/task.cpp",
                 "src/TaskManager.cpp",
                 "src/trashpile.cpp",

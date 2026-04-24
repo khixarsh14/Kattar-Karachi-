@@ -3,6 +3,7 @@
 
 # Build files
 build/
+!build/
 *.exe
 *.out
 *.o
