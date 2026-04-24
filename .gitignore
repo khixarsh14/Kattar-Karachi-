@@ -1,5 +1,5 @@
 # Ignore VS Code settings
-.vscode/
+#.vscode/
 
 # Build files
 build/
@@ -16,3 +16,4 @@ Thumbs.db
 
 # Temporary files
 *.tmp
+code_dump.txt

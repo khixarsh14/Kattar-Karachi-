@@ -1,0 +1,39 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build game",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "src/main.cpp",
+                "src/game.cpp",
+                "src/player.cpp",
+                "src/map.cpp",
+                "src/obstacle.cpp",
+                "src/Pothole.cpp",
+                "src/pushcart.cpp",
+                "src/scoremanager.cpp",
+                "src/streetdog.cpp",
+                "src/task.cpp",
+                "src/TaskManager.cpp",
+                "src/trashpile.cpp",
+                "src/UImanager.cpp",
+                "-o",
+                "build/game.exe",
+                "-Iinclude",
+                "-IC:/raylib/raylib/src",
+                "-LC:/raylib/raylib/src",
+                "-lraylib",
+                "-lopengl32",
+                "-lgdi32",
+                "-lwinmm"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"]
+        }
+    ]
+}

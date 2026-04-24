@@ -88,7 +88,7 @@ void Game::Run() {
 
 
         // temporary text for testing
-        DrawText("Kattar Karachi under construction", 0, 0, 50, BLACK);
+        DrawText("Kattar Karachi under construction !!!!", 0, 0, 50, BLACK);
 
 
         EndDrawing();
