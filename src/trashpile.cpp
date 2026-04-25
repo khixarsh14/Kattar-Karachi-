@@ -1,4 +1,4 @@
-#include "trashpile.h"
+#include "TrashPile.h"
 
 
 TrashPile::TrashPile(Vector2 pos)
