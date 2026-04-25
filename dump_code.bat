@@ -70,7 +70,7 @@ if exist saves (
     for %%f in (saves\*) do (
         echo ===== %%f ===== >> %OUT%
         type "%%f" >> %OUT%
-        echo. >> %OUT%
+        echo. >> %OUT% 
     )
 )
 
