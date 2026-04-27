@@ -18,6 +18,7 @@
                 "src/TaskManager.cpp",
                 "src/trashpile.cpp",
                 "src/UImanager.cpp",
+                "src/audiomanager.cpp",
                 "-o",
                 "build/game.exe",
                 "-Iinclude",
