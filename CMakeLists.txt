@@ -14,6 +14,7 @@ set(SOURCES
     src/TaskManager.cpp
     src/scoremanager.cpp
     src/UImanager.cpp
+    src/audiomanager.cpp
 )
 
 add_executable(game ${SOURCES})
