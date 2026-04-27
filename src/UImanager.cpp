@@ -22,6 +22,10 @@ void UIManager::DrawHearts(const Player& p) {
 }
 
 void UIManager::DrawCurrentTask(const TaskManager& tm) {
+    if (tm.AllTasksDone()) {
+        DrawText("All tasks done!", 20, 50, 20, GREEN);
+        return;  // stop here, don't call GetCurrentTask()
+    }
     std::string text = tm.GetCurrentTask().GetDescription();
     DrawText(text.c_str(), 20, 50, 20, BLACK);
 }

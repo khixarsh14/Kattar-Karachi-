@@ -28,11 +28,11 @@ void TaskManager::Init()
 }
 
 
-const Task& TaskManager::GetCurrentTask() const
-{
-    return tasks[currentIndex];
+const Task& TaskManager::GetCurrentTask() const {
+    if (currentIndex < (int)tasks.size())
+        return tasks[currentIndex];
+    return tasks.back();  // safely return the last task when all are done
 }
-
 void TaskManager::CompleteCurrentTask()
 {
     if (currentIndex < (int)tasks.size())
