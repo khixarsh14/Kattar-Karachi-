@@ -10,7 +10,7 @@
 PushCart::PushCart(Vector2 pos)
     : Obstacle(pos, 72.0f, 60.0f)
 {
-    texture = LoadTexture("assets/sprites/pushcart.png");
+    texture = LoadTexture("assets/obstacles/pushcart.png");
     SetTextureFilter(texture, TEXTURE_FILTER_POINT); // Keep pixel-art crisp at 3x
 }
 
@@ -37,4 +37,18 @@ void PushCart::Draw() {
 
 int PushCart::GetDamage() {
     return 1;
+}
+
+Rectangle PushCart::GetBounds()
+{
+    float scale = 3.0f;
+    float w = 45 * scale;
+    float h = 19 * scale;
+
+    return {
+        position.x,
+        position.y,
+        w,
+        h
+    };
 }

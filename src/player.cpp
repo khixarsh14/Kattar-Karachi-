@@ -87,8 +87,7 @@ void Player::Update(float dt) {
         isJumping  = false;
     }
 
-    // --- world side walls ---
-    position.x = Clamp(position.x, WORLD_LEFT_WALL, WORLD_RIGHT_WALL);
+
 
     // --- invincibility blink ---
     if (isInvincible) {
@@ -126,8 +125,7 @@ void Player::Draw() {
     const int DISP_W  = BASE_W * SCALE;   // 60px on screen
     const int DISP_H  = BASE_H * SCALE;   // 90px on screen
 
-    Rectangle dest = { position.x, position.y, (float)DISP_W, (float)DISP_H };
-
+    Rectangle dest = { position.x, position.y - DISP_H, (float)DISP_W, (float)DISP_H };
     if (isJumping) {
         // jump sprite - single frame, flip by making src width negative
         Rectangle src = {
@@ -196,5 +194,28 @@ Vector2 Player::GetPosition() const {
 
 // slightly smaller than sprite for fair-feeling collisions
 Rectangle Player::GetBounds() const {
-    return Rectangle{ position.x + 8, position.y + 8, 44, 74 };
+    return Rectangle{
+        position.x + 12,      // tighter sides
+        position.y - 80,      // move UP (VERY IMPORTANT)
+        36,
+        60
+    };
+}
+
+float Player::GetVelocityY() const { return velY; }
+
+void Player::SetPositionY(float y)
+{
+    position.y = y;
+    velY = 0;
+}
+
+void Player::SetPositionX(float x)
+{
+    position.x = x;
+}
+
+void Player::SetOnGround(bool val)
+{
+    isOnGround = val;
 }

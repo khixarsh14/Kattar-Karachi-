@@ -19,7 +19,17 @@ bool Obstacle::IsLethal() {
 
 
 Rectangle Obstacle::GetBounds() {
-    return { position.x, position.y, width, height };
+    float scale = 3.0f;
+
+    float w = width * scale;
+    float h = height * scale;
+
+    return {
+        position.x + 10,
+        position.y + 25,   // push DOWN more
+        w - 20,
+        h - 25
+    };
 }
 
 //  Returns whether this obstacle should be checked for collisions and drawn on screen.

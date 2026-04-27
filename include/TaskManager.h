@@ -24,7 +24,7 @@ public:
     void Init();
 
     // Returns a reference to the active task UIManager reads description from here
-    Task& GetCurrentTask();
+    const Task& GetCurrentTask() const;
     
     void CompleteCurrentTask();
     

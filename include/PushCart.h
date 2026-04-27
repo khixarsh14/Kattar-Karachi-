@@ -20,6 +20,7 @@ public:
     void Draw()           override;   
    
     int  GetDamage()      override;
+    Rectangle GetBounds() override;
 
     
 };

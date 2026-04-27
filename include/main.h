@@ -5,36 +5,36 @@ const int   SCREEN_W          = 1152;
 const int   SCREEN_H          = 528;
 const int   SCALE             = 3;
 
-// world
-const int   WORLD_W           = 6912;
+// world (for now = one background)
+const int   WORLD_W           = 3072;
 
-// layer Y positions (display px)
+// ----- LAYERS (BASE → *3 = DISPLAY) -----
 const int   SKY_Y             = 0;
-const int   SKY_H             = 186;
-const int   BUILDING_Y        = 186;
-const int   BUILDING_H        = 222;
-const int   FOOTPATH_Y        = 408;
-const int   FOOTPATH_H        = 72;
-const int   ROAD_Y            = 480;
-const int   ROAD_H            = 48;
+const int   BUILDING_Y        = 45 * 3;    // 135
 
-// player
-const float GROUND_Y          = 408.0f;
+// FOOTPATH SYSTEM (your new design)
+const int   FOOTPATH_TOP      = 141 * 3;   // 423
+const int   FOOTPATH_BOTTOM   = 150 * 3;   // 450
+const int   FOOTPATH_WALL_TOP = 151 * 3;   // 453
+const int   ROAD_Y            = 159 * 3;   // 477
+
+// ----- PLAYER -----
+const float GROUND_Y          = 146 * 3.0f;   // ✅ 438 (your confirmed value)
+
 const float PLAYER_SPEED      = 200.0f;
 const float PLAYER_JUMP       = -550.0f;
 const float GRAVITY           = 1200.0f;
+
 const float INVINCIBLE_TIME   = 1.5f;
 const int   MAX_HEARTS        = 5;
 
-// camera
-const float CAM_OFFSET_RIGHT  = SCREEN_W / 4.0f;
-const float CAM_OFFSET_LEFT   = SCREEN_W * 3.0f / 4.0f;
+// ----- CAMERA -----
 const float CAM_LERP          = 0.1f;
 
-// world boundary walls
-const float WORLD_LEFT_WALL   = SCREEN_W / 4.0f;
-const float WORLD_RIGHT_WALL  = WORLD_W - (SCREEN_W / 4.0f);
+// ----- WORLD WALLS (match camera system) -----
+const float WORLD_LEFT_WALL   = SCREEN_W / 2.0f;
+const float WORLD_RIGHT_WALL  = WORLD_W - (SCREEN_W / 2.0f);
 
-// score
+// ----- SCORE -----
 const int   SCORE_PER_TASK    = 1000;
 const float SCORE_TIME_MULT   = 10.0f;

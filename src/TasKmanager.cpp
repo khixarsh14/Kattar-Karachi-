@@ -21,14 +21,14 @@ void TaskManager::Init()
 
     // Task 2  destination: Bun Kebab stall (shopID 1)
     // After pickup, UIManager will show the bun-kebab warning message
-    tasks.push_back(Task("Pick up bun kebab from street stall", 1));
+    tasks.push_back(Task("Pick up bun kebab from Shah Jee BUN KEBAB", 1));
 
     // Task 3  destination: Medical store (shopID 2)
     tasks.push_back(Task("Get Panadol from medical store", 2));
 }
 
 
-Task& TaskManager::GetCurrentTask()
+const Task& TaskManager::GetCurrentTask() const
 {
     return tasks[currentIndex];
 }

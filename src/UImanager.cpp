@@ -1,79 +1,57 @@
+#include "UImanager.h"
 
-// PRIVATE attribute (add with your other private stuff):
-//
-//   float introTimer;
-//   // counts down from 3 to 0 at game start. shows the urdu intro message.
-
-
-// PUBLIC methods (add with your other public methods):
-//
-//   void DrawIntroMessage();
-//   // draws "Traffic bohot hai, sambhal ke!" at top-centre for 3 seconds
-//
-//   void DrawSpecialMessage(const TaskManager& tm);
-//   // draws the bun kebab warning while task 2 is active
-
-
-// Also update DrawHUD signature to accept dt:
-//   void DrawHUD(const Player& p, const TaskManager& tm, const ScoreManager& sm, float dt);
-
-// In your constructor UIManager::UIManager(), add:
-//   introTimer = 3.0f;
-
-
-void UIManager::DrawIntroMessage()
-{
-    // draws the urdu flavour text at the top centre of the screen
-    const char* msg = "Traffic bohot hai, sambhal ke!";
-    int textWidth = MeasureText(msg, 24);
-    DrawText(msg, (1152 / 2) - (textWidth / 2), 20, 24, YELLOW);
+UIManager::UIManager() {
+    introTimer = 3.0f;
 }
 
+void UIManager::Init() {
+    heartRed  = LoadTexture("assets/hearts/redheart.png");
+    heartGrey = LoadTexture("assets/hearts/greyheart.png");
 
+    SetTextureFilter(heartRed, TEXTURE_FILTER_POINT);
+    SetTextureFilter(heartGrey, TEXTURE_FILTER_POINT);
+}
 
-void UIManager::DrawSpecialMessage(const TaskManager& tm)
-{
-    // gets the special warning message from task manager
-    // for task 2 (bun kebab) this returns "Don't drop the bun kebab (avoid obstacles!)"
-    // for all other tasks it returns "" so nothing is drawn
-    std::string msg = tm.GetSpecialMessage();
-    if (!msg.empty())
-    {
-        DrawText(msg.c_str(), 20, 50, 20, ORANGE);
+void UIManager::DrawHearts(const Player& p) {
+    int x = 20;
+    for (int i = 0; i < 5; i++) {
+        Texture2D tex = (i < p.currentHearts) ? heartRed : heartGrey;
+        DrawTextureEx(tex, {(float)x, 10}, 0, 3.0f, WHITE);
+        x += 50;
     }
 }
 
+void UIManager::DrawCurrentTask(const TaskManager& tm) {
+    std::string text = tm.GetCurrentTask().GetDescription();
+    DrawText(text.c_str(), 20, 50, 20, BLACK);
+}
 
+void UIManager::DrawElapsedTime(const ScoreManager& sm) {
+    DrawText(TextFormat("Time: %.1f", sm.GetElapsedTime()), 900, 10, 20, BLACK);
+}
 
-void UIManager::DrawHUD(const Player& p, const TaskManager& tm, const ScoreManager& sm, float dt)
-{
-    // if intro timer is still running, show the urdu message instead of task
-    if (introTimer > 0.0f)
-    {
+void UIManager::DrawIntroMessage() {
+    const char* msg = "Traffic bohot hai, sambhal ke!";
+    int w = MeasureText(msg, 24);
+    DrawText(msg, (1152/2 - w/2), 20, 24, YELLOW);
+}
+
+void UIManager::DrawSpecialMessage(const TaskManager& tm) {
+    std::string msg = tm.GetSpecialMessage();
+    if (!msg.empty()) {
+        DrawText(msg.c_str(), 20, 80, 20, ORANGE);
+    }
+}
+
+void UIManager::DrawHUD(const Player& p, const TaskManager& tm, const ScoreManager& sm, float dt) {
+    if (introTimer > 0) {
         introTimer -= dt;
         DrawIntroMessage();
-    }
-    else
-    {
-        DrawCurrentTask(tm);       // your existing function, no change
-        DrawSpecialMessage(tm);    // new shows bun kebab warning if task 2 is active
+    } else {
+        DrawCurrentTask(tm);
+        DrawSpecialMessage(tm);
     }
 
-    // these stay exactly the same as before
     DrawHearts(p);
     DrawElapsedTime(sm);
 }
-
-//  SUMMARY  what to add in total:
-//
-//  UIManager.h:
-//    private:  float introTimer;
-//    public:   void DrawIntroMessage();
-//    public:   void DrawSpecialMessage(const TaskManager& tm);
-//    update:   DrawHUD signature to include float dt
-//
-//  UIManager.cpp:
-//    constructor:    introTimer = 3.0f;
-//    DrawIntroMessage():  draw "Traffic bohot hai, sambhal ke!" top-centre
-//    DrawSpecialMessage(): get tm.GetSpecialMessage(), draw if not empty
-//    DrawHUD():       add intro countdown logic + call DrawSpecialMessage
