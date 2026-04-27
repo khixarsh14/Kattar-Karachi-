@@ -124,8 +124,8 @@ void Game::Run() {
         if (camera.target.x < halfScreen)
             camera.target.x = halfScreen;
 
-        if (camera.target.x > 3072 - halfScreen)
-            camera.target.x = 3072 - halfScreen;
+        if (camera.target.x > WORLD_W - halfScreen)
+            camera.target.x = WORLD_W - halfScreen;
 
         camera.target.y = 528 / 2.0f;
 
