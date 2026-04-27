@@ -56,4 +56,9 @@ public:
     bool IsOnGround()    const;
     Vector2   GetPosition() const;
     Rectangle GetBounds()   const;
+
+    float GetVelocityY() const;
+    void SetPositionY(float y);
+    void SetPositionX(float x);
+    void SetOnGround(bool val);
 };

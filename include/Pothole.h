@@ -26,4 +26,5 @@ public:
     // Returns true  tells Game to trigger HandleGameOver()
     // immediately without deducting individual hearts.
     bool IsLethal()       override;
+    Rectangle GetBounds() override;
 };

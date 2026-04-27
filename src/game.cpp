@@ -1,112 +1,175 @@
 #include "game.h"
 #include "raylib.h"
-
+#include "raymath.h"
+#include "player.h"
+#include "map.h"
+#include "TaskManager.h"
+#include "scoremanager.h"
+#include "UImanager.h"
+#include "Pothole.h"
+#include "PushCart.h"
+#include "TrashPile.h"
+#include <vector>
+#include <cstdlib>
+#include <ctime>
 
 void Game::Run() {
-
-
-    // ---------------- INIT ----------------
-    // setup window and FPS
     InitWindow(1152, 528, "Kattar Karachi");
     SetTargetFPS(60);
 
+    srand(time(NULL));
 
-    // LoadAssets()
-    // loads textures, sounds, fonts for game
+    Player player;
+    player.Init({400, GROUND_Y});
 
+    Map map;
+    map.Init();
 
-    // InitObjects()
-    // initialize player, map, obstacles, UI
+    TaskManager tm;
+    tm.Init();
 
+    ScoreManager sm;
+    sm.StartTimer();
 
+    UIManager ui;
+    ui.Init();
 
+    Camera2D camera = {0};
+    camera.target = player.GetPosition();
+    camera.offset = { 1152 / 2.0f, 528 / 2.0f };
+    camera.zoom = 1.0f;
 
-    // ---------------- GAME LOOP ----------------
+    std::vector<Obstacle*> obstacles;
+
+    // --- SECTION 1 (easy start) ---
+    obstacles.push_back(new TrashPile({800, 417}));
+
+    // --- SECTION 2 ---
+    obstacles.push_back(new PushCart({1100, 393}));
+    obstacles.push_back(new TrashPile({1350, 417}));
+
+    // --- SECTION 3 ---
+    obstacles.push_back(new Pothole({1650, 429}));
+    obstacles.push_back(new PushCart({1900, 393}));
+
+    // --- SECTION 4 ---
+    obstacles.push_back(new TrashPile({2200, 417}));
+    obstacles.push_back(new Pothole({2500, 429}));
+
+    bool gameOver = false;
+
     while (!WindowShouldClose()) {
-
-
-        // ---------------- UPDATE ----------------
         float dt = GetFrameTime();
 
+        // -------- UPDATE --------
+        player.Update(dt);
 
-        // Input()
-        // reads keyboard input (left, right, jump)
+        // -------- COLLISIONS --------
+        for (auto o : obstacles)
+        {
+            if (!o->IsActive()) continue;
 
+            Rectangle p = player.GetBounds();
+            Rectangle ob = o->GetBounds();
 
-        // PlayerMove(dt)
-        // moves player left/right based on input
+            if (!CheckCollisionRecs(p, ob)) continue;
 
+            // ===== PUSHCART SPECIAL LOGIC =====
+            if (dynamic_cast<PushCart*>(o))
+            {
+                // ✅ LAND ON TOP
+                if (IsLandingOnTop(p, ob, player.GetVelocityY()))
+                {
+                    player.SetPositionY(ob.y);   // stand on top
+                    player.SetOnGround(true);
+                }
+                else
+                {
+                    // ✅ SIDE HIT → DAMAGE + BLOCK
+                    player.TakeDamage(*o);
 
-        // ApplyGravity(dt)
-        // handles jumping and falling
+                    if (p.x < ob.x)
+                        player.SetPositionX(ob.x - p.width); // left block
+                    else
+                        player.SetPositionX(ob.x + ob.width); // right block
+                }
+            }
+            else
+            {
+                // ===== NORMAL OBSTACLES =====
+                if (o->IsLethal())
+                {
+                    gameOver = true;
+                }
+                else
+                {
+                    player.TakeDamage(*o);
+                }
+            }
+        }
 
+        if (!player.IsAlive()) {
+            gameOver = true;
+        }
 
-        // CameraFollow(player.x)
-        // moves camera with player (side scrolling logic)
+        // -------- CAMERA (SMOOTH + CLAMPED) --------
+        float targetX = player.GetPosition().x;
 
+        // smooth follow (lerp)
+        camera.target.x = Lerp(camera.target.x, targetX, 0.08f);
 
-        // CheckCollision(player, obstacles)
-        // checks collision and reduces health
+        // clamp inside map (map = 3072 width)
+        float halfScreen = 1152 / 2.0f;
 
+        if (camera.target.x < halfScreen)
+            camera.target.x = halfScreen;
 
-        // UpdateTasks(player.position)
-        // completes task if player reaches location
+        if (camera.target.x > 3072 - halfScreen)
+            camera.target.x = 3072 - halfScreen;
 
+        camera.target.y = 528 / 2.0f;
 
-        // UpdateScore()
-        // updates score based on progress
+        // -------- TASK SYSTEM --------
+        float px = player.GetPosition().x;
+        int target = tm.GetActiveShopID();
 
+        if (target == 0 && px >= 521) tm.CompleteCurrentTask();
+        else if (target == 1 && px >= 846) tm.CompleteCurrentTask();
+        else if (target == 2 && px >= 1475) tm.CompleteCurrentTask();
 
-        // UpdateUI()
-        // updates hearts, task text, etc.
+        if (tm.AllTasksDone()) {
+            sm.StopTimer();
+        }
 
-
-
-
-        // ---------------- DRAW ----------------
+        // -------- DRAW --------
         BeginDrawing();
-
-
-        // ClearScreen()
         ClearBackground(RAYWHITE);
 
+        BeginMode2D(camera);
 
-        // DrawMap(camera)
-        // draws background, buildings, road
+        if (gameOver) {
+            DrawText("GAME OVER", 450, 250, 40, RED);
+            EndDrawing();
+            continue;
+        }
 
+        map.Draw();
+        player.Draw();
 
-        // DrawObstacles()
-        // draws pothole, cart, trash, dog
+        // draw obstacles
+        for (auto o : obstacles) {
+            if (o->IsActive())
+                o->Draw();
+        }
 
+        EndMode2D();
 
-        // DrawPlayer()
-        // draws player sprite
-
-
-        // DrawUI()
-        // draws hearts, tasks, score
-
-
-        // temporary text for testing
-        DrawText("Kattar Karachi under construction !!!!", 0, 0, 50, BLACK);
-
+        ui.DrawHUD(player, tm, sm, dt);
 
         EndDrawing();
-
-
-
-
-        // ---------------- GAME STATE ----------------
-        // CheckGameOver()
-        // if hearts == 0 → end game
-
-
-        // CheckTaskComplete()
-        // if all tasks done → win game
     }
 
-
-    // ---------------- CLEANUP ----------------
-    // free memory and close window
+    for (auto o : obstacles) delete o;
+    map.Unload();
     CloseWindow();
 }
