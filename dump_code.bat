@@ -37,29 +37,29 @@ if exist CMakeLists.txt (
     type CMakeLists.txt >> %OUT%
 )
 
-if exist README.md (
-    echo. >> %OUT%
-    echo ===== README.md ===== >> %OUT%
-    type README.md >> %OUT%
-)
+::if exist README.md (
+::    echo. >> %OUT%
+::    echo ===== README.md ===== >> %OUT%
+::    type README.md >> %OUT%
+::)
 
-if exist .gitignore (
-    echo. >> %OUT%
-    echo ===== .gitignore ===== >> %OUT%
-    type .gitignore >> %OUT%
-)
+::if exist .gitignore (
+::    echo. >> %OUT%
+::    echo ===== .gitignore ===== >> %OUT%
+::    type .gitignore >> %OUT%
+::)
 
 :: =========================
 :: OPTIONAL (CONFIG FILES)
 :: =========================
-echo. >> %OUT%
-echo ===== CONFIG FILES ===== >> %OUT%
+::echo. >> %OUT%
+::echo ===== CONFIG FILES ===== >> %OUT%
 
-for /r .vscode %%f in (*.json) do (
-    echo. >> %OUT%
-    echo ===== %%f ===== >> %OUT%
-    type "%%f" >> %OUT%
-)
+::for /r .vscode %%f in (*.json) do (
+::    echo. >> %OUT%
+::    echo ===== %%f ===== >> %OUT%
+::    type "%%f" >> %OUT%
+::)
 
 :: =========================
 :: SAVE FILES (optional)

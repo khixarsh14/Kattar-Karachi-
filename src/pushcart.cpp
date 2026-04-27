@@ -1,54 +1,40 @@
 #include "pushcart.h"
 
-// Y POSITION NOTE:
-// The position passed in (pos) should be set so the BOTTOM
-// of the cart sits on the footpath.
-// Recommended: pos.y = FOOTPATH_Y - 60  (60px = the full display height of the cart sprite)
-// This way the cart wheels appear to rest ON the footpath.
-
-
 PushCart::PushCart(Vector2 pos)
-    : Obstacle(pos, 72.0f, 60.0f)
+    : Obstacle(pos, 45.0f, 19.0f)  // base size
 {
     texture = LoadTexture("assets/obstacles/pushcart.png");
-    SetTextureFilter(texture, TEXTURE_FILTER_POINT); // Keep pixel-art crisp at 3x
+    SetTextureFilter(texture, TEXTURE_FILTER_POINT);
 }
-
 
 PushCart::~PushCart() {
     UnloadTexture(texture);
 }
 
-
 void PushCart::Update(float dt) {
-    (void)dt; 
-    // Nothing to update
+    (void)dt;
 }
-
 
 void PushCart::Draw() {
     if (!isActive) return;
-
     DrawTextureEx(texture, position, 0.0f, 3.0f, WHITE);
 }
-//  Returns 1 as Player loses 1 heart when colliding with a pushcart.
-//  Game::CheckCollisions() will call player->TakeDamage(obs)
-//  which calls TakeDamage( obs.GetDamage() ) = TakeDamage(1).
 
 int PushCart::GetDamage() {
     return 1;
 }
 
-Rectangle PushCart::GetBounds()
-{
+// landing surface at y=3 base pixels from top (user specified)
+// position.y + (3 * 3) = position.y + 9 display pixels
+Rectangle PushCart::GetBounds() {
     float scale = 3.0f;
-    float w = 45 * scale;
-    float h = 19 * scale;
-
+    float w = width * scale;   // 135px
+    float h = height * scale;  // 57px
+    
     return {
-        position.x,
-        position.y,
-        w,
-        h
+        position.x + 8,       // slight horizontal padding
+        position.y + 6,      
+        w - 20,                // 115px wide hitbox
+        h - 9                  // 48px tall hitbox
     };
 }

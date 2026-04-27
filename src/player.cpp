@@ -1,6 +1,7 @@
 #include "player.h"
 #include "obstacle.h"
 #include "raymath.h"
+
 Player::Player() {
     position    = {0, 0};
     velX        = 0;
@@ -30,13 +31,12 @@ Player::~Player() {
 
 void Player::Init(Vector2 startPos) {
     position = startPos;
-    groundY  = startPos.y;  // wherever we spawn is the floor
+    groundY  = startPos.y;
 
     texIdle = LoadTexture("assets/sprites/player_idle.png");
     texWalk = LoadTexture("assets/sprites/player_walk.png");
     texJump = LoadTexture("assets/sprites/player_jump.png");
 
-    // pixel art - no blurring
     SetTextureFilter(texIdle, TEXTURE_FILTER_POINT);
     SetTextureFilter(texWalk, TEXTURE_FILTER_POINT);
     SetTextureFilter(texJump, TEXTURE_FILTER_POINT);
@@ -45,7 +45,6 @@ void Player::Init(Vector2 startPos) {
 void Player::Update(float dt) {
     isMoving = false;
 
-    // --- horizontal movement, works in air too ---
     if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
         velX = PLAYER_SPEED;
         facingRight = true;
@@ -58,28 +57,23 @@ void Player::Update(float dt) {
         velX = 0;
     }
 
-    // --- jump start ---
     if ((IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) && isOnGround) {
-        velY = PLAYER_JUMP;   // negative = up in raylib
+        velY = PLAYER_JUMP;
         isOnGround = false;
         isJumping  = true;
     }
 
-    // --- jump cut: let go early = shorter jump (feels way better) ---
     if ((IsKeyReleased(KEY_SPACE) || IsKeyReleased(KEY_UP) || IsKeyReleased(KEY_W)) && velY < 0) {
         velY *= 0.45f;
     }
 
-    // --- gravity ---
     if (!isOnGround) {
         velY += GRAVITY * dt;
     }
 
-    // --- apply velocity ---
     position.x += velX * dt;
     position.y += velY * dt;
 
-    // --- land ---
     if (position.y >= groundY) {
         position.y = groundY;
         velY       = 0;
@@ -87,9 +81,6 @@ void Player::Update(float dt) {
         isJumping  = false;
     }
 
-
-
-    // --- invincibility blink ---
     if (isInvincible) {
         invincTimer -= dt;
         blinkTimer  += dt;
@@ -103,7 +94,6 @@ void Player::Update(float dt) {
         }
     }
 
-    // --- walk animation (only on ground, only moving) ---
     if (isOnGround && isMoving) {
         frameTimer += dt;
         if (frameTimer >= FRAME_SPEED) {
@@ -111,32 +101,32 @@ void Player::Update(float dt) {
             frameTimer   = 0;
         }
     } else if (isOnGround && !isMoving) {
-        // reset to first frame when standing still
         currentFrame = 0;
         frameTimer   = 0;
     }
+
+
 }
 
 void Player::Draw() {
-    if (!blinkVisible) return;  // skip frame when blinking = damage effect
+    if (!blinkVisible) return;
 
     const int BASE_W  = 20;
     const int BASE_H  = 30;
-    const int DISP_W  = BASE_W * SCALE;   // 60px on screen
-    const int DISP_H  = BASE_H * SCALE;   // 90px on screen
+    const int DISP_W  = BASE_W * SCALE;
+    const int DISP_H  = BASE_H * SCALE;
 
+    // sprite draws with BOTTOM at position.y
     Rectangle dest = { position.x, position.y - DISP_H, (float)DISP_W, (float)DISP_H };
-    if (isJumping) {
-        // jump sprite - single frame, flip by making src width negative
+    
+    if (isJumping && !isOnGround) {
         Rectangle src = {
             0, 0,
             facingRight ? (float)BASE_W : -(float)BASE_W,
             (float)BASE_H
         };
         DrawTexturePro(texJump, src, dest, {0, 0}, 0, WHITE);
-
     } else if (isMoving) {
-        // walk spritesheet - 8 frames side by side, each 20px wide
         Rectangle src = {
             (float)(currentFrame * BASE_W),
             0,
@@ -144,9 +134,7 @@ void Player::Draw() {
             (float)BASE_H
         };
         DrawTexturePro(texWalk, src, dest, {0, 0}, 0, WHITE);
-
     } else {
-        // idle - single frame
         Rectangle src = {
             0, 0,
             facingRight ? (float)BASE_W : -(float)BASE_W,
@@ -156,10 +144,8 @@ void Player::Draw() {
     }
 }
 
-// --- damage overloads ---
-
 void Player::TakeDamage(int amount) {
-    if (isInvincible) return;   // no damage during grace period
+    if (isInvincible) return;
 
     currentHearts -= amount;
     if (currentHearts < 0) currentHearts = 0;
@@ -171,10 +157,8 @@ void Player::TakeDamage(int amount) {
 }
 
 void Player::TakeDamage(Obstacle& obs) {
-    TakeDamage(obs.GetDamage());  // just forward to the int version
+    TakeDamage(obs.GetDamage());
 }
-
-// --- getters ---
 
 bool Player::IsAlive() const {
     return currentHearts > 0;
@@ -192,30 +176,36 @@ Vector2 Player::GetPosition() const {
     return position;
 }
 
-// slightly smaller than sprite for fair-feeling collisions
+// CRITICAL FIX: hitbox MUST match where sprite is drawn
 Rectangle Player::GetBounds() const {
+    const int DISP_H = 30 * SCALE;  // 90px
+    
+    // sprite bottom = position.y
+    // sprite top = position.y - 90
+    // hitbox slightly smaller for fair gameplay
     return Rectangle{
-        position.x + 12,      // tighter sides
-        position.y - 80,      // move UP (VERY IMPORTANT)
-        36,
-        60
+        position.x + 12,           // 12px padding on sides
+        position.y - DISP_H + 20,  // 20px from top of sprite
+        36,                         // 36px wide (vs 60px sprite)
+        65                          // 65px tall (vs 90px sprite)
     };
 }
 
-float Player::GetVelocityY() const { return velY; }
-
-void Player::SetPositionY(float y)
-{
-    position.y = y;
-    velY = 0;
+float Player::GetVelocityY() const { 
+    return velY; 
 }
 
-void Player::SetPositionX(float x)
-{
+void Player::SetPositionY(float y) {
+    position.y = y;
+    velY = 0;
+    isJumping = false; 
+}
+
+void Player::SetPositionX(float x) {
     position.x = x;
 }
 
-void Player::SetOnGround(bool val)
-{
+void Player::SetOnGround(bool val) {
     isOnGround = val;
 }
+
