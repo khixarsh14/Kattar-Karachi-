@@ -10,6 +10,8 @@ protected:
     Texture2D  texture;    
 
 public:
+    bool isPlayerTouching = false;
+    
     Obstacle(Vector2 pos, float w, float h);   // Called by every subclass ctor
     virtual ~Obstacle();                        // MUST be virtual â€” safe delete via base ptr
 
