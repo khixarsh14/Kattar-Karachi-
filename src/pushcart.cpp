@@ -1,7 +1,7 @@
 #include "pushcart.h"
 
 PushCart::PushCart(Vector2 pos)
-    : Obstacle(pos, 45.0f, 19.0f)  // base size
+    : Obstacle(pos, 45.0f, 19.0f,1)  // base size
 {
     texture = LoadTexture("assets/obstacles/pushcart.png");
     SetTextureFilter(texture, TEXTURE_FILTER_POINT);

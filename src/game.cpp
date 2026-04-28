@@ -10,6 +10,7 @@
 #include "PushCart.h"
 #include "TrashPile.h"
 #include "shopper.h"
+#include "audiomanager.h"
 
 #include <vector>
 #include <unordered_set>
@@ -35,6 +36,9 @@ void Game::Run() {
 
     UIManager ui;
     ui.Init();
+
+    AudioManager audio;
+    audio.Init();
 
     Shopper shopper;
     shopper.Init("assets/shopper/shopper.png");
@@ -68,6 +72,8 @@ void Game::Run() {
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
 
+        audio.Update();
+
         if (!gameOver) {
 
             player.Update(dt);
@@ -99,9 +105,10 @@ void Game::Run() {
                     }
                     else
                     {
-                        if (prevCollisions.count(o) == 0)
+                        if (prevCollisions.count(o) == 0){
                             player.TakeDamage(*o);
-
+                            audio.PlayObstacleSound(1);
+                        }
                         float playerCenter = pRect.x + pRect.width / 2;
                         float obstacleCenter = oRect.x + oRect.width / 2;
                         float pushOffset = 8.0f;
@@ -116,14 +123,17 @@ void Game::Run() {
                 }
                 else
                 {
+                    
+                    if (prevCollisions.count(o) == 0){
+                        player.TakeDamage(*o);
+                        audio.PlayObstacleSound(o->GetObstacleType());
+                    }
+
                     if (o->IsLethal())
                     {
                         gameOver = true;
                         continue;
                     }
-
-                    if (prevCollisions.count(o) == 0)
-                        player.TakeDamage(*o);
                 }
             }
 
@@ -144,6 +154,7 @@ void Game::Run() {
 
                     shopper.Deactivate();
                     tm.CompleteCurrentTask();
+                    audio.PlayTaskComplete();
 
                     int next = tm.GetCompletedCount();
 
@@ -155,7 +166,7 @@ void Game::Run() {
                 }
             }
 
-            //--- CAMERA --- ⭐ FIXED SMOOTH CAMERA
+            //--- CAMERA ---
             float playerX = player.GetPosition().x;
             Vector2 targetCam = {playerX, SCREEN_H / 2.0f};
 
@@ -197,6 +208,7 @@ void Game::Run() {
     }
 
     for (auto o : obstacles) delete o;
+    audio.Unload();
     map.Unload();
     CloseWindow();
 }

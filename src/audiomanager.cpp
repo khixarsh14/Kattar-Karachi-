@@ -16,6 +16,7 @@ void AudioManager::Init() {
 
     bgMusic       = LoadMusicStream("assets/sounds/backgroundmusic.mp3"); 
     sndPushcart   = LoadSound("assets/sounds/pushcart.mp3");
+    sndPothole      = LoadSound("assets/sounds/pothole.mp3");
     sndTrashpile  = LoadSound("assets/sounds/trashpile.mp3");
     sndTaskComplete = LoadSound("assets/sounds/taskcompletion.mp3"); 
     sndGameOver   = LoadSound("assets/sounds/gameover.mp3"); 

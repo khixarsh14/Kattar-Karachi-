@@ -1,7 +1,7 @@
 #include "TrashPile.h"
 
 TrashPile::TrashPile(Vector2 pos)
-    : Obstacle(pos, 38.0f, 22.0f)  // base size
+    : Obstacle(pos, 38.0f, 22.0f,2)  // base size
 {
     texture = LoadTexture("assets/obstacles/trash.png");
     SetTextureFilter(texture, TEXTURE_FILTER_POINT);
