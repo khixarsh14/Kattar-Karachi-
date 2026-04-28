@@ -45,6 +45,7 @@ void Player::Init(Vector2 startPos) {
 void Player::Update(float dt) {
     isMoving = false;
 
+    // ⭐ SMOOTH DECELERATION + JITTER FIX
     if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
         velX = PLAYER_SPEED;
         facingRight = true;
@@ -54,7 +55,16 @@ void Player::Update(float dt) {
         facingRight = false;
         isMoving = true;
     } else {
-        velX = 0;
+        // Smooth deceleration
+        if (velX > 0) {
+            velX -= 800.0f * dt;
+            if (velX < 0) velX = 0;
+        } else if (velX < 0) {
+            velX += 800.0f * dt;
+            if (velX > 0) velX = 0;
+        }
+        // ⭐ FINAL JITTER KILLER: Snap tiny velocities
+        if (fabsf(velX) < 5.0f) velX = 0.0f;
     }
 
     if ((IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) && isOnGround) {
@@ -72,7 +82,9 @@ void Player::Update(float dt) {
     }
 
     position.x += velX * dt;
+    position.x = roundf(position.x);
     position.y += velY * dt;
+    position.y = roundf(position.y);
 
     if (position.y >= groundY) {
         position.y = groundY;
@@ -94,16 +106,21 @@ void Player::Update(float dt) {
         }
     }
 
+
+
+
+// ⭐ FIXED: Prevent collision from resetting walk animation
     if (isOnGround && isMoving) {
         frameTimer += dt;
         if (frameTimer >= FRAME_SPEED) {
             currentFrame = (currentFrame + 1) % WALK_FRAMES;
-            frameTimer   = 0;
+            frameTimer = 0;
         }
     } else if (isOnGround && !isMoving) {
         currentFrame = 0;
-        frameTimer   = 0;
+        frameTimer = 0;
     }
+
 
 
 }
@@ -116,7 +133,6 @@ void Player::Draw() {
     const int DISP_W  = BASE_W * SCALE;
     const int DISP_H  = BASE_H * SCALE;
 
-    // sprite draws with BOTTOM at position.y
     Rectangle dest = { position.x, position.y - DISP_H, (float)DISP_W, (float)DISP_H };
     
     if (isJumping && !isOnGround) {
@@ -176,18 +192,13 @@ Vector2 Player::GetPosition() const {
     return position;
 }
 
-// CRITICAL FIX: hitbox MUST match where sprite is drawn
 Rectangle Player::GetBounds() const {
-    const int DISP_H = 30 * SCALE;  // 90px
-    
-    // sprite bottom = position.y
-    // sprite top = position.y - 90
-    // hitbox slightly smaller for fair gameplay
+    const int DISP_H = 30 * SCALE;
     return Rectangle{
-        position.x + 12,           // 12px padding on sides
-        position.y - DISP_H + 20,  // 20px from top of sprite
-        36,                         // 36px wide (vs 60px sprite)
-        65                          // 65px tall (vs 90px sprite)
+        position.x + 12,
+        position.y - DISP_H + 20,
+        36,
+        65
     };
 }
 
@@ -208,4 +219,3 @@ void Player::SetPositionX(float x) {
 void Player::SetOnGround(bool val) {
     isOnGround = val;
 }
-
