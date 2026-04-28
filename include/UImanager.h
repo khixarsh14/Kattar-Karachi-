@@ -6,6 +6,8 @@
 
 class UIManager {
 private:
+
+    Font pixelFont;
     Texture2D heartRed;
     Texture2D heartGrey;
 
