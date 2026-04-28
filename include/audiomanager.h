@@ -12,6 +12,7 @@ private:
     Sound sndTrashpile;
     Sound sndTaskComplete;
     Sound sndGameOver;
+    Sound sndButton;
 
     // Flags to prevent repeated triggering
     bool gameOverPlayed;
@@ -21,7 +22,7 @@ public:
     ~AudioManager();
 
     void Init();
-    void Update();          // call every frame — keeps music streaming
+    void Update();
     void Unload();
 
     // Playback triggers (called from game.cpp at the right moments)

@@ -12,7 +12,6 @@ AudioManager::AudioManager()
 AudioManager::~AudioManager() {}
 
 void AudioManager::Init() {
-    InitAudioDevice();
 
     bgMusic       = LoadMusicStream("assets/sounds/backgroundmusic.mp3"); 
     sndPushcart   = LoadSound("assets/sounds/pushcart.mp3");
@@ -54,5 +53,4 @@ void AudioManager::Unload() {
     UnloadSound(sndTrashpile);
     UnloadSound(sndTaskComplete);
     UnloadSound(sndGameOver);
-    CloseAudioDevice();
 }

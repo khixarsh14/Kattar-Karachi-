@@ -11,7 +11,6 @@ protected:
     int obstacleType;    
 
 public:
-    bool isPlayerTouching = false;
     
     Obstacle(Vector2 pos, float w, float h, int type);   // Called by every subclass ctor
     virtual ~Obstacle();                        // MUST be virtual â€” safe delete via base ptr

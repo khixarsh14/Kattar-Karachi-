@@ -4,12 +4,12 @@
 class Map {
 private:
     Texture2D bg;
-    Texture2D sky;      // ⭐ NEW: Sky layer
-    float skyOffsetX;   // ⭐ Parallax offset
+    Texture2D sky;
+    float skyOffsetX;
 
 public:
     void Init();
-    void Draw(Camera2D camera);  // ⭐ Pass camera
-    void Update(float camX);     // ⭐ Update parallax
+    void Draw(Camera2D camera);  
+    void Update(float camX);   
     void Unload();
 };
