@@ -9,6 +9,7 @@
 #include "Pothole.h"
 #include "PushCart.h"
 #include "TrashPile.h"
+#include "shopper.h"
 
 #include <vector>
 #include <unordered_set>
@@ -35,6 +36,16 @@ void Game::Run() {
     UIManager ui;
     ui.Init();
 
+    Shopper shopper;
+    shopper.Init("assets/shopper/shopper.png");
+
+    // SHOP ORDER (your required order)
+    float shopX[3] = {1527, 225, 2640};
+
+    // spawn first shopper
+    shopper.Spawn(shopX[0], 351);
+
+
     Camera2D camera = {0};
     camera.target = player.GetPosition();
     camera.offset = { SCREEN_W / 2.0f, SCREEN_H / 2.0f };
@@ -51,8 +62,6 @@ void Game::Run() {
     obstacles.push_back(new Pothole({2500, 424}));
 
     bool gameOver = false;
-
-    // 🔥 NEW: track collisions
     std::unordered_set<Obstacle*> prevCollisions;
 
     while (!WindowShouldClose()) {
@@ -61,12 +70,13 @@ void Game::Run() {
         if (!gameOver) {
 
             player.Update(dt);
+            shopper.Update(dt);   // ⭐ IMPORTANT
 
             bool onPlatform = false;
             Rectangle pRect = player.GetBounds();
-
             std::unordered_set<Obstacle*> currentCollisions;
 
+            // --- OBSTACLES ---
             for (auto o : obstacles)
             {
                 if (!o->IsActive()) continue;
@@ -78,43 +88,31 @@ void Game::Run() {
 
                 currentCollisions.insert(o);
 
-                // -------- PUSH CART --------
                 if (PushCart* cart = dynamic_cast<PushCart*>(o))
                 {
                     if (IsLandingOnTop(pRect, oRect, player.GetVelocityY()))
                     {
-                        // ✅ stable landing (no flicker)
                         player.SetPositionY(oRect.y + 5);
                         player.SetOnGround(true);
                         onPlatform = true;
                     }
                     else
                     {
-                        // ✅ damage only once per contact
                         if (prevCollisions.count(o) == 0)
                             player.TakeDamage(*o);
 
-                        // side push
                         float playerCenter = pRect.x + pRect.width / 2;
                         float obstacleCenter = oRect.x + oRect.width / 2;
-
-                        float pushOffset = 8.0f;  // extra spacing to prevent sticking
+                        float pushOffset = 8.0f;
 
                         if (playerCenter < obstacleCenter)
-                        {
                             player.SetPositionX(oRect.x - pRect.width - pushOffset);
-                        }
                         else
-                        {
                             player.SetPositionX(oRect.x + oRect.width + pushOffset);
-                        }
 
-                        // 🔥 CRITICAL: stop horizontal movement
-                        // prevents re-collision every frame
                         player.SetOnGround(true);
                     }
                 }
-                // -------- OTHER OBSTACLES --------
                 else
                 {
                     if (o->IsLethal())
@@ -123,13 +121,11 @@ void Game::Run() {
                         continue;
                     }
 
-                    // ✅ damage once per contact
                     if (prevCollisions.count(o) == 0)
                         player.TakeDamage(*o);
                 }
             }
 
-            // update collision memory
             prevCollisions = currentCollisions;
 
             if (!onPlatform)
@@ -141,29 +137,34 @@ void Game::Run() {
             if (!player.IsAlive())
                 gameOver = true;
 
-            // camera
-            float targetX = player.GetPosition().x;
-            camera.target.x = Lerp(camera.target.x, targetX, 0.08f);
+            // --- SHOPPER COLLISION (NEW SYSTEM) ---
+            if (!tm.AllTasksDone() && shopper.IsActive()) {
+                if (CheckCollisionRecs(pRect, shopper.GetBounds())) {
+
+                    shopper.Deactivate();
+                    tm.CompleteCurrentTask();
+
+                    int next = tm.GetCompletedCount();
+
+                    if (next < 3) {
+                        shopper.Spawn(shopX[next], 351);
+                    } else {
+                        sm.StopTimer();
+                    }
+                }
+            }
+
+            // --- CAMERA ---
+            float playerX = player.GetPosition().x;
+            camera.target.x = Lerp(camera.target.x, playerX, 0.08f);
 
             float halfScreen = SCREEN_W / 2.0f;
-
             if (camera.target.x < halfScreen)
                 camera.target.x = halfScreen;
             if (camera.target.x > WORLD_W - halfScreen)
                 camera.target.x = WORLD_W - halfScreen;
 
             camera.target.y = SCREEN_H / 2.0f;
-
-            // tasks
-            float px = player.GetPosition().x;
-            int target = tm.GetActiveShopID();
-
-            if (target == 0 && px >= 75 && px <= 195) tm.CompleteCurrentTask();
-            else if (target == 1 && px >= 846 && px <= 966) tm.CompleteCurrentTask();
-            else if (target == 2 && px >= 521 && px <= 641) tm.CompleteCurrentTask();
-
-            if (tm.AllTasksDone())
-                sm.StopTimer();
         }
 
         // --- DRAW ---
@@ -172,16 +173,17 @@ void Game::Run() {
 
         BeginMode2D(camera);
 
+        map.Draw();
+
         if (gameOver) {
-            map.Draw();
             DrawText("GAME OVER", 450, 250, 40, RED);
         } else {
-            map.Draw();
 
             for (auto o : obstacles)
                 if (o->IsActive())
                     o->Draw();
 
+            shopper.Draw();   // ⭐ NEW
             player.Draw();
         }
 
@@ -193,7 +195,6 @@ void Game::Run() {
     }
 
     for (auto o : obstacles) delete o;
-    
     map.Unload();
     CloseWindow();
 }

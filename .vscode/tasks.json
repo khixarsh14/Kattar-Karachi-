@@ -19,6 +19,7 @@
                 "src/trashpile.cpp",
                 "src/UImanager.cpp",
                 "src/audiomanager.cpp",
+                "src/shopper.cpp",
                 "-o",
                 "build/game.exe",
                 "-Iinclude",

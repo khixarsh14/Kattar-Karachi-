@@ -1,22 +1,13 @@
 #pragma once
 #include <string>
+using namespace std;
 
-class Task {
-private:
-    std::string description;   
-    int  targetShopID;  
-    bool isCompleted;   
 
-public:
+struct Task {
+    string description;
+    float targetX;
+    bool isCompleted;
+
     Task();
-   
-    Task(std::string desc, int shopID);
-
-    void Complete();
-
-    bool        IsCompleted()    const;
-    std::string GetDescription() const;
-    int         GetTargetShopID()const;
-
-    bool operator==(const Task& other) const;
+    Task(string desc, float x);
 };
