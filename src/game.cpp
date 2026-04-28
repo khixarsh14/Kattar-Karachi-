@@ -47,9 +47,10 @@ void Game::Run() {
 
 
     Camera2D camera = {0};
-    camera.target = player.GetPosition();
+    camera.target = {400, SCREEN_H / 2.0f};  // Match player start X
     camera.offset = { SCREEN_W / 2.0f, SCREEN_H / 2.0f };
     camera.zoom = 1.0f;
+
 
     std::vector<Obstacle*> obstacles;
 
@@ -110,7 +111,7 @@ void Game::Run() {
                         else
                             player.SetPositionX(oRect.x + oRect.width + pushOffset);
 
-                        player.SetOnGround(true);
+                        //player.SetOnGround(true);
                     }
                 }
                 else
@@ -154,17 +155,18 @@ void Game::Run() {
                 }
             }
 
-            // --- CAMERA ---
+            //--- CAMERA --- ⭐ FIXED SMOOTH CAMERA
             float playerX = player.GetPosition().x;
-            camera.target.x = Lerp(camera.target.x, playerX, 0.08f);
+            Vector2 targetCam = {playerX, SCREEN_H / 2.0f};
 
             float halfScreen = SCREEN_W / 2.0f;
-            if (camera.target.x < halfScreen)
-                camera.target.x = halfScreen;
-            if (camera.target.x > WORLD_W - halfScreen)
-                camera.target.x = WORLD_W - halfScreen;
+            targetCam.x = Clamp(targetCam.x, halfScreen, WORLD_W - halfScreen);
 
-            camera.target.y = SCREEN_H / 2.0f;
+            // Faster lerp = no lag at edges
+            camera.target.x = Lerp(camera.target.x, targetCam.x, 0.15f);
+            camera.target.y = Lerp(camera.target.y, targetCam.y, 0.15f);
+
+            map.Update(camera.target.x);
         }
 
         // --- DRAW ---
@@ -173,7 +175,7 @@ void Game::Run() {
 
         BeginMode2D(camera);
 
-        map.Draw();
+        map.Draw(camera);
 
         if (gameOver) {
             DrawText("GAME OVER", 450, 250, 40, RED);
