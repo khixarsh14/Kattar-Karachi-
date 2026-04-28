@@ -1,7 +1,7 @@
 #include "UImanager.h"
 
 UIManager::UIManager() {
-    introTimer = 3.0f;
+    introTimer = 6.0f;
 }
 
 void UIManager::Init() {
@@ -10,6 +10,8 @@ void UIManager::Init() {
 
     SetTextureFilter(heartRed, TEXTURE_FILTER_POINT);
     SetTextureFilter(heartGrey, TEXTURE_FILTER_POINT);
+    pixelFont = LoadFontEx("assets/font/PressStart2P-Regular.ttf", 22, nullptr, 0);
+    SetTextureFilter(pixelFont.texture, TEXTURE_FILTER_POINT);
 }
 
 void UIManager::DrawHearts(const Player& p) {
@@ -23,21 +25,28 @@ void UIManager::DrawHearts(const Player& p) {
 
 void UIManager::DrawCurrentTask(const TaskManager& tm) {
     if (tm.AllTasksDone()) {
-        DrawText("All tasks done!", 20, 50, 20, GREEN);
-        return;  // stop here, don't call GetCurrentTask()
+        DrawTextEx(pixelFont, "All tasks done!", {22, 76}, 18, 2, BLACK);
+        DrawTextEx(pixelFont, "All tasks done!", {20, 74}, 18, 2, GREEN);
+        return; // stop here, don't call GetCurrentTask()
     }
     std::string text = tm.GetCurrentTask().description;
-    DrawText(text.c_str(), 20, 50, 20, BLACK);
+    DrawTextEx(pixelFont, text.c_str(), {22, 76}, 18, 2, BLACK);
+    DrawTextEx(pixelFont, text.c_str(), {20, 74}, 18, 2, WHITE);
 }
 
 void UIManager::DrawElapsedTime(const ScoreManager& sm) {
-    DrawText(TextFormat("Time: %.1f", sm.GetElapsedTime()), 900, 10, 20, BLACK);
+    const char* timeText = TextFormat("Time: %.1f", sm.GetElapsedTime());
+    DrawTextEx(pixelFont, timeText, {902, 12}, 18, 2, BLACK);
+    DrawTextEx(pixelFont, timeText, {900, 10}, 18, 2, WHITE);
 }
 
 void UIManager::DrawIntroMessage() {
     const char* msg = "Traffic bohot hai, sambhal ke!";
-    int w = MeasureText(msg, 24);
-    DrawText(msg, (1152/2 - w/2), 20, 24, YELLOW);
+    Vector2 size = MeasureTextEx(pixelFont, msg, 25, 2);
+    float x = (1152 / 2) - (size.x / 2);
+    // shadow then main text
+    DrawTextEx(pixelFont, msg, {x + 2, 76}, 25, 2, BLACK);
+    DrawTextEx(pixelFont, msg, {x,     74}, 25, 2, YELLOW);
 }
 
 
