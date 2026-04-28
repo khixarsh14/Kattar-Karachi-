@@ -2,7 +2,7 @@
 
 void Map::Init() {
     bg = LoadTexture("assets/backgrounds/bg.png");
-    sky = LoadTexture("assets/backgrounds/sky.png");  // ⭐ Load sky
+    sky = LoadTexture("assets/backgrounds/sky.png");
     SetTextureFilter(bg, TEXTURE_FILTER_POINT);
     SetTextureFilter(sky, TEXTURE_FILTER_POINT);
     skyOffsetX = 0;
@@ -13,9 +13,9 @@ void Map::Update(float camX) {
 }
 
 void Map::Draw(Camera2D camera) {
-    // ⭐ Sky first (farthest layer)
+   
     DrawTextureEx(sky, {-skyOffsetX, 0}, 0.0f, 3.0f, WHITE);
-    DrawTextureEx(sky, {-skyOffsetX + sky.width * 3.0f, 0}, 0.0f, 3.0f, WHITE); // Repeat sky
+    DrawTextureEx(sky, {-skyOffsetX + sky.width * 3.0f, 0}, 0.0f, 3.0f, WHITE); 
     // Map layer (normal speed)
     DrawTextureEx(bg, {0, 0}, 0.0f, 3.0f, WHITE);
 }
