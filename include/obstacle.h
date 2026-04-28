@@ -7,12 +7,13 @@ protected:
     float      width;      
     float      height;     
     bool       isActive;   // If false: skip update, draw, and collision
-    Texture2D  texture;    
+    Texture2D  texture;
+    int obstacleType;    
 
 public:
     bool isPlayerTouching = false;
     
-    Obstacle(Vector2 pos, float w, float h);   // Called by every subclass ctor
+    Obstacle(Vector2 pos, float w, float h, int type);   // Called by every subclass ctor
     virtual ~Obstacle();                        // MUST be virtual â€” safe delete via base ptr
 
     
@@ -30,4 +31,5 @@ public:
     bool    IsActive()            const;       // Returns isActive
     void    SetActive(bool active);            // Enable / disable this obstacle
     Vector2 GetPosition()         const;       // Returns position
+    int GetObstacleType() const { return obstacleType; }
 };

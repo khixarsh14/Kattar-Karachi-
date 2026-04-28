@@ -1,7 +1,7 @@
 #include "obstacle.h"
 
-Obstacle::Obstacle(Vector2 pos, float w, float h)
-    : position(pos), width(w), height(h), isActive(true)
+Obstacle::Obstacle(Vector2 pos, float w, float h, int type)
+    : position(pos), width(w), height(h), isActive(true), obstacleType(type)
 {}
 
 Obstacle::~Obstacle() {

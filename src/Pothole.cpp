@@ -1,7 +1,7 @@
 #include "Pothole.h"
 
 Pothole::Pothole(Vector2 pos)
-    : Obstacle(pos, 30.0f, 10.0f)  // base size
+    : Obstacle(pos, 30.0f, 10.0f,0)  // base size
 {
     texture = LoadTexture("assets/obstacles/pothole.png");
     SetTextureFilter(texture, TEXTURE_FILTER_POINT);
