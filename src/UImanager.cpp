@@ -26,7 +26,7 @@ void UIManager::DrawCurrentTask(const TaskManager& tm) {
         DrawText("All tasks done!", 20, 50, 20, GREEN);
         return;  // stop here, don't call GetCurrentTask()
     }
-    std::string text = tm.GetCurrentTask().GetDescription();
+    std::string text = tm.GetCurrentTask().description;
     DrawText(text.c_str(), 20, 50, 20, BLACK);
 }
 
@@ -40,12 +40,6 @@ void UIManager::DrawIntroMessage() {
     DrawText(msg, (1152/2 - w/2), 20, 24, YELLOW);
 }
 
-void UIManager::DrawSpecialMessage(const TaskManager& tm) {
-    std::string msg = tm.GetSpecialMessage();
-    if (!msg.empty()) {
-        DrawText(msg.c_str(), 20, 80, 20, ORANGE);
-    }
-}
 
 void UIManager::DrawHUD(const Player& p, const TaskManager& tm, const ScoreManager& sm, float dt) {
     if (introTimer > 0) {
@@ -58,4 +52,9 @@ void UIManager::DrawHUD(const Player& p, const TaskManager& tm, const ScoreManag
 
     DrawHearts(p);
     DrawElapsedTime(sm);
+}
+
+
+void UIManager::DrawSpecialMessage(const TaskManager& tm) {
+    // temporary empty function
 }
