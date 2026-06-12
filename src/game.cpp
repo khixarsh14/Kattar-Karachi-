@@ -227,6 +227,21 @@ void Game::Run()
         cloudOffset += cloudSpeed * dt;
         while (cloudOffset >= cloudTileW)
             cloudOffset -= cloudTileW;
+        //  START SCREEN
+        if (state == STATE_START) {
+            // Draw to render texture
+            BeginTextureMode(renderTarget);
+            ClearBackground(BLACK);
+            DrawTexture(texStart, 0, 0, WHITE);
+            if (CheckCollisionPointRec(GetScaledMouse(renderTarget), playBtn))
+                DrawRectangleRec(playBtn, {255, 255, 255, 40});
+            EndTextureMode();
+
+            // Scale to window
+            BeginDrawing();
+            ClearBackground(BLACK);
+            DrawScaled(renderTarget);
+            EndDrawing();
 
 
         if (state == STATE_START)
@@ -244,6 +259,62 @@ void Game::Run()
         else if (state == STATE_PLAYING)
         {
             audio.Update();
+
+        // F11 = toggle fullscreen
+        if (IsKeyPressed(KEY_F11)) {
+            if (IsWindowFullscreen()) {
+                ToggleFullscreen();
+                SetWindowSize(1152, 528);
+            } else {
+                int mon = GetCurrentMonitor();
+                SetWindowSize(GetMonitorWidth(mon), GetMonitorHeight(mon));
+                ToggleFullscreen();
+            }
+        }
+        //  GAME OVER SCREEN
+        if (state == STATE_GAMEOVER) {
+            BeginTextureMode(renderTarget);
+            ClearBackground(BLACK);
+            DrawTexture(texEnd, 0, 0, WHITE);
+
+            // Centred score & time
+            const char* scoreText = TextFormat("Score: %d", finalScore);
+            const char* timeText  = TextFormat("Time:  %.1f s", sm.GetElapsedTime());
+
+            int sw = MeasureText(scoreText, 36);
+            int tw = MeasureText(timeText,  28);
+
+            int cx = 1152 / 2;
+            int cy = 528  / 2;
+
+            // shadow + text for score
+            DrawText(scoreText, cx - sw/2 + 2, cy - 30 + 2, 36, BLACK);
+            DrawText(scoreText, cx - sw/2,     cy - 30,     36, YELLOW);
+
+            // shadow + text for time
+            DrawText(timeText,  cx - tw/2 + 2, cy + 20 + 2, 28, BLACK);
+            DrawText(timeText,  cx - tw/2,     cy + 20,     28, WHITE);
+            EndTextureMode();
+
+            // Scale to window
+            BeginDrawing();     
+            ClearBackground(BLACK);
+            DrawScaled(renderTarget);
+            EndDrawing();
+
+            //close window
+            if (IsKeyPressed(KEY_ENTER) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                audio.Unload();
+                map.Unload();
+                state = STATE_START;
+            }
+            continue;
+        }
+
+        //  PLAYING
+        audio.Update();
+
+        if (!gameOver) {
             player.Update(dt);
             shopper.Update(dt);
 
@@ -364,7 +435,6 @@ void Game::Run()
                 break;
         }
 
-
         BeginTextureMode(renderTarget);
         ClearBackground(RAYWHITE);
 
@@ -429,6 +499,8 @@ void Game::Run()
             DrawText(highText,  cx - highW / 2,       highY,      28, WHITE);
 
         }
+        ui.DrawHUD(player, tm, sm, dt);
+        EndTextureMode();
 
         EndTextureMode();
 

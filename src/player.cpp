@@ -45,7 +45,7 @@ void Player::Init(Vector2 startPos) {
 void Player::Update(float dt) {
     isMoving = false;
 
-    // ⭐ SMOOTH DECELERATION + JITTER FIX
+    //  SMOOTH DECELERATION + JITTER FIX
     if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
         velX = PLAYER_SPEED;
         facingRight = true;
@@ -63,7 +63,7 @@ void Player::Update(float dt) {
             velX += 800.0f * dt;
             if (velX > 0) velX = 0;
         }
-        // ⭐ FINAL JITTER KILLER: Snap tiny velocities
+        //  FINAL JITTER KILLER: Snap tiny velocities
         if (fabsf(velX) < 5.0f) velX = 0.0f;
     }
 
