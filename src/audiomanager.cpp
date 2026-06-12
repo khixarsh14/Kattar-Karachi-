@@ -54,3 +54,8 @@ void AudioManager::Unload() {
     UnloadSound(sndTaskComplete);
     UnloadSound(sndGameOver);
 }
+
+void AudioManager::RestartMusic() {
+    StopMusicStream(bgMusic);
+    PlayMusicStream(bgMusic);
+}

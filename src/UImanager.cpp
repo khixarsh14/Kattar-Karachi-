@@ -24,6 +24,13 @@ void UIManager::DrawHearts(const Player& p) {
 }
 
 void UIManager::DrawCurrentTask(const TaskManager& tm) {
+    // int boxX = 0;
+    // int boxY = 0;
+    // int boxW = 520;
+    // int boxH = 115;
+
+    // DrawRectangle(boxX, boxY, boxW, boxH, Fade(GRAY, 0.25f));
+
     if (tm.AllTasksDone()) {
         DrawTextEx(pixelFont, "All tasks done!", {22, 76}, 18, 2, BLACK);
         DrawTextEx(pixelFont, "All tasks done!", {20, 74}, 18, 2, GREEN);
@@ -31,7 +38,7 @@ void UIManager::DrawCurrentTask(const TaskManager& tm) {
     }
     std::string text = tm.GetCurrentTask().description;
     DrawTextEx(pixelFont, text.c_str(), {22, 76}, 18, 2, BLACK);
-    DrawTextEx(pixelFont, text.c_str(), {20, 74}, 18, 2, WHITE);
+    DrawTextEx(pixelFont, text.c_str(), {20, 74}, 18, 2, YELLOW);
 }
 
 void UIManager::DrawElapsedTime(const ScoreManager& sm) {
@@ -41,7 +48,7 @@ void UIManager::DrawElapsedTime(const ScoreManager& sm) {
 }
 
 void UIManager::DrawIntroMessage() {
-    const char* msg = "Traffic bohot hai, sambhal ke!";
+    const char* msg = "Complete ALL the tasks!";
     Vector2 size = MeasureTextEx(pixelFont, msg, 25, 2);
     float x = (1152 / 2) - (size.x / 2);
     // shadow then main text

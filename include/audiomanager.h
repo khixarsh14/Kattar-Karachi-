@@ -29,4 +29,5 @@ public:
     void PlayObstacleSound(int obstacleType); // 0=pothole, 1=pushcart, 2=trashpile
     void PlayTaskComplete();
     void PlayGameOver();
+    void RestartMusic();
 };

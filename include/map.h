@@ -6,6 +6,7 @@ private:
     Texture2D bg;
     Texture2D sky;
     float skyOffsetX;
+    float prevCamX;
 
 public:
     void Init();
