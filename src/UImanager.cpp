@@ -44,7 +44,7 @@ void UIManager::DrawCurrentTask(const TaskManager& tm) {
 void UIManager::DrawElapsedTime(const ScoreManager& sm) {
     const char* timeText = TextFormat("Time: %.1f", sm.GetElapsedTime());
     DrawTextEx(pixelFont, timeText, {902, 12}, 18, 2, BLACK);
-    DrawTextEx(pixelFont, timeText, {900, 10}, 18, 2, WHITE);
+    DrawTextEx(pixelFont, timeText, {900, 10}, 18, 2, YELLOW);
 }
 
 void UIManager::DrawIntroMessage() {
