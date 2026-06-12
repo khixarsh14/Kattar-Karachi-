@@ -17,11 +17,46 @@
 #include <cstdlib>
 #include <ctime>
 
+// Returns the scale rect for drawing renderTarget centered in the window
+static void DrawScaled(RenderTexture2D& rt) {
+    int winW = GetScreenWidth();
+    int winH = GetScreenHeight();
+    float scaleX = (float)winW / 1152;
+    float scaleY = (float)winH / 528;
+    float scale  = (scaleX < scaleY) ? scaleX : scaleY;
+    float drawW  = 1152 * scale;
+    float drawH  = 528  * scale;
+    float offX   = (winW - drawW) / 2.0f;
+    float offY   = (winH - drawH) / 2.0f;
+
+    // NOTE: negative height in src flips the texture (Raylib stores it upside-down)
+    Rectangle src  = { 0, 0, 1152, -528 };
+    Rectangle dest = { offX, offY, drawW, drawH };
+    DrawTexturePro(rt.texture, src, dest, {0,0}, 0.0f, WHITE);
+}
+
+// Converts real mouse position → game-space position (accounts for scale + letterbox)
+static Vector2 GetScaledMouse(RenderTexture2D& rt) {
+    int winW = GetScreenWidth();
+    int winH = GetScreenHeight();
+    float scaleX = (float)winW / 1152;
+    float scaleY = (float)winH / 528;
+    float scale  = (scaleX < scaleY) ? scaleX : scaleY;
+    float offX   = (winW - 1152 * scale) / 2.0f;
+    float offY   = (winH - 528  * scale) / 2.0f;
+    Vector2 m    = GetMousePosition();
+    return { (m.x - offX) / scale, (m.y - offY) / scale };
+}
+
 void Game::Run() {
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(1152, 528, "Kattar Karachi");
+    SetWindowMinSize(576, 264);   // minimum = half game size
     SetTargetFPS(60);
     srand(time(NULL));
-
+    // Fixed-resolution render target — game always draws at 1152×528
+    RenderTexture2D renderTarget = LoadRenderTexture(1152, 528);
+    SetTextureFilter(renderTarget.texture, TEXTURE_FILTER_POINT); // keeps pixels sharp
     //audios
     InitAudioDevice();
     Sound sndButton = LoadSound("assets/sounds/button.mp3");
@@ -102,13 +137,18 @@ void Game::Run() {
 
         //  START SCREEN
         if (state == STATE_START) {
-            BeginDrawing();
+            // Draw to render texture
+            BeginTextureMode(renderTarget);
+            ClearBackground(BLACK);
             DrawTexture(texStart, 0, 0, WHITE);
-
-            // Optional subtle hover tint so the player knows the button is clickable
-            if (CheckCollisionPointRec(GetMousePosition(), playBtn))
+            if (CheckCollisionPointRec(GetScaledMouse(renderTarget), playBtn))
                 DrawRectangleRec(playBtn, {255, 255, 255, 40});
+            EndTextureMode();
 
+            // Scale to window
+            BeginDrawing();
+            ClearBackground(BLACK);
+            DrawScaled(renderTarget);
             EndDrawing();
 
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) &&
@@ -120,9 +160,21 @@ void Game::Run() {
             continue;
         }
 
+        // F11 = toggle fullscreen
+        if (IsKeyPressed(KEY_F11)) {
+            if (IsWindowFullscreen()) {
+                ToggleFullscreen();
+                SetWindowSize(1152, 528);
+            } else {
+                int mon = GetCurrentMonitor();
+                SetWindowSize(GetMonitorWidth(mon), GetMonitorHeight(mon));
+                ToggleFullscreen();
+            }
+        }
         //  GAME OVER SCREEN
         if (state == STATE_GAMEOVER) {
-            BeginDrawing();
+            BeginTextureMode(renderTarget);
+            ClearBackground(BLACK);
             DrawTexture(texEnd, 0, 0, WHITE);
 
             // Centred score & time
@@ -142,7 +194,12 @@ void Game::Run() {
             // shadow + text for time
             DrawText(timeText,  cx - tw/2 + 2, cy + 20 + 2, 28, BLACK);
             DrawText(timeText,  cx - tw/2,     cy + 20,     28, WHITE);
+            EndTextureMode();
 
+            // Scale to window
+            BeginDrawing();     
+            ClearBackground(BLACK);
+            DrawScaled(renderTarget);
             EndDrawing();
 
             //close window
@@ -244,8 +301,8 @@ void Game::Run() {
             }
         }
 
-        // Draw
-        BeginDrawing();
+        // Draw — game renders to fixed 1152×528 texture
+        BeginTextureMode(renderTarget);
         ClearBackground(RAYWHITE);
 
         BeginMode2D(camera);
@@ -259,7 +316,12 @@ void Game::Run() {
         EndMode2D();
 
         ui.DrawHUD(player, tm, sm, dt);
+        EndTextureMode();
 
+        // Scale texture to actual window size
+        BeginDrawing();
+        ClearBackground(BLACK);
+        DrawScaled(renderTarget);
         EndDrawing();
     }
 
@@ -270,6 +332,7 @@ void Game::Run() {
         map.Unload();
     }
 
+    UnloadRenderTexture(renderTarget);
     UnloadSound(sndButton);
     CloseAudioDevice();
     UnloadTexture(texStart);
