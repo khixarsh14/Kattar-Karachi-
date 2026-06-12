@@ -31,13 +31,13 @@ void UIManager::DrawCurrentTask(const TaskManager& tm) {
     }
     std::string text = tm.GetCurrentTask().description;
     DrawTextEx(pixelFont, text.c_str(), {22, 76}, 18, 2, BLACK);
-    DrawTextEx(pixelFont, text.c_str(), {20, 74}, 18, 2, WHITE);
+    DrawTextEx(pixelFont, text.c_str(), {20, 74}, 18, 2, YELLOW);
 }
 
 void UIManager::DrawElapsedTime(const ScoreManager& sm) {
     const char* timeText = TextFormat("Time: %.1f", sm.GetElapsedTime());
     DrawTextEx(pixelFont, timeText, {902, 12}, 18, 2, BLACK);
-    DrawTextEx(pixelFont, timeText, {900, 10}, 18, 2, WHITE);
+    DrawTextEx(pixelFont, timeText, {900, 10}, 18, 2, YELLOW);
 }
 
 void UIManager::DrawIntroMessage() {
