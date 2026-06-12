@@ -9,9 +9,9 @@ void TaskManager::Init()
     tasks.clear();
 
     // CORRECT ORDER: Medical (509) → Zainab (75) → Bun Kebab (880)
-    tasks.push_back(Task("Get Panadol from Medical Store", 509));
-    tasks.push_back(Task("Buy EID clothes from Zainab Market", 75));
-    tasks.push_back(Task("Pick up Bun Kabab", 880));
+    tasks.push_back(Task("TASK 1: Get 1 Panadol ka patta", 509));
+    tasks.push_back(Task("TASK 2: Get shirt from Zainab Market", 75));
+    tasks.push_back(Task("TASK 3: Pick up Bun Kabab", 880));
 
     currentIndex = 0;
     completedCount = 0;
