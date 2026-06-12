@@ -2,7 +2,6 @@
 #.vscode/
 
 # Build files
-build/
 !build/
 *.exe
 *.out
